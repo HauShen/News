@@ -1,0 +1,22 @@
+//Create User
+curl -v -X POST -H "Content-Type: application/json" -d '{"name":"Hau", "age":20, "role": "NEWS_POSTER"}'  http://localhost:8080/user/create
+
+//Get User By UserId
+curl -v -X GET http://localhost:8080/user/get/e1e031f3-0f27-4524-a2cb-934c9648d132
+
+//Edit User Profile By UserId
+curl -v -X PUT -H "Content-Type: application/json" -d '{"name":"Hau", "age":15, "role": "NEWS_POSTER"}'  http://localhost:8080/user/update/e1e031f3-0f27-4524-a2cb-934c9648d132
+
+
+//Create Article by UserId
+curl -v -X POST -H "Content-Type: application/json" -d '{"title":"A fighting on street!!", "content":"none"}'  http://localhost:8080/article/create/e1e031f3-0f27-4524-a2cb-934c9648d132
+
+//Get Article By oid
+curl -v -X GET http://localhost:8080/article/get/301
+
+//Edit Article by oid
+curl -v -X PUT -H "Content-Type: application/json" -d '{"title":"Name", "content":"I am John"}'  http://localhost:8080/article/edit/301
+
+// Delete Article By Oid
+curl -X DELETE http://localhost:8080/article/delete/301
+
