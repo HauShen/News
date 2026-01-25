@@ -1,11 +1,11 @@
 package com.hau.news.controllers;
 
-import com.hau.news.requestBodies.ArticleRequestBody;
-import com.hau.news.requestBodies.ArticleUpdatedRequestBody;
-import com.hau.news.responseBodies.ArticleResponseBody;
-import com.hau.news.responseBodies.ArticleUpdatedResponseBody;
+import com.hau.news.requestbodies.ArticleRequestBody;
+import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
+import com.hau.news.responsebodies.ArticleResponseBody;
+import com.hau.news.responsebodies.ArticleUpdatedResponseBody;
 import com.hau.news.services.ArticleService;
-import com.hau.news.services.ArticleServiceImpl;
+import com.hau.news.serviceimpls.ArticleServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;

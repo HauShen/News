@@ -1,10 +1,9 @@
 package com.hau.news.services;
 
-import com.hau.news.models.UserProfile;
-import com.hau.news.requestBodies.ArticleRequestBody;
-import com.hau.news.requestBodies.ArticleUpdatedRequestBody;
-import com.hau.news.responseBodies.ArticleResponseBody;
-import com.hau.news.responseBodies.ArticleUpdatedResponseBody;
+import com.hau.news.requestbodies.ArticleRequestBody;
+import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
+import com.hau.news.responsebodies.ArticleResponseBody;
+import com.hau.news.responsebodies.ArticleUpdatedResponseBody;
 
 public interface ArticleService {
     ArticleResponseBody createArticleByUserId(String userId,ArticleRequestBody articleRequestBody);

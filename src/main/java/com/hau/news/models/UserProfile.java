@@ -1,7 +1,7 @@
 package com.hau.news.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.hau.news.Roles.Role;
+import com.hau.news.models.roles.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,7 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;

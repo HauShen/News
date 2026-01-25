@@ -9,7 +9,7 @@ curl -v -X PUT -H "Content-Type: application/json" -d '{"name":"Hau", "age":15, 
 
 
 //Create Article by UserId
-curl -v -X POST -H "Content-Type: application/json" -d '{"title":"A fighting on street!!", "content":"none"}'  http://localhost:8080/article/create/e1e031f3-0f27-4524-a2cb-934c9648d132
+curl -v -X POST -H "Content-Type: application/json" -d '{"title":"A fighting on school!!", "content":"none"}'  http://localhost:8080/article/create/e1e031f3-0f27-4524-a2cb-934c9648d132
 
 //Get Article By oid
 curl -v -X GET http://localhost:8080/article/get/301
@@ -19,4 +19,7 @@ curl -v -X PUT -H "Content-Type: application/json" -d '{"title":"Name", "content
 
 // Delete Article By Oid
 curl -X DELETE http://localhost:8080/article/delete/301
+
+// Swagger
+localhost:8080/swagger-ui/index.html#/
 

@@ -1,4 +1,4 @@
-package com.hau.news.services;
+package com.hau.news.serviceimpls;
 
 import com.hau.news.models.Article;
 import com.hau.news.models.UserProfile;
@@ -6,10 +6,11 @@ import com.hau.news.models.exceptions.ArticleNotFoundException;
 import com.hau.news.models.exceptions.UserNotFoundException;
 import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.UserRepository;
-import com.hau.news.requestBodies.ArticleRequestBody;
-import com.hau.news.requestBodies.ArticleUpdatedRequestBody;
-import com.hau.news.responseBodies.ArticleResponseBody;
-import com.hau.news.responseBodies.ArticleUpdatedResponseBody;
+import com.hau.news.requestbodies.ArticleRequestBody;
+import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
+import com.hau.news.responsebodies.ArticleResponseBody;
+import com.hau.news.responsebodies.ArticleUpdatedResponseBody;
+import com.hau.news.services.ArticleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

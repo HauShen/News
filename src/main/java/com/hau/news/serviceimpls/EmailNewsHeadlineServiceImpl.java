@@ -1,9 +1,10 @@
-package com.hau.news.services;
+package com.hau.news.serviceimpls;
 
 import com.hau.news.models.Article;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
 import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.EmailNewsHeadlineRepository;
+import com.hau.news.services.EmailNewsHeadlineService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ import java.util.List;
 
 
 @Service
-public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService{
+public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
     private EmailNewsHeadlineRepository emailNewsHeadlineRepository;
     private ArticleRepository articleRepository;
     @Autowired

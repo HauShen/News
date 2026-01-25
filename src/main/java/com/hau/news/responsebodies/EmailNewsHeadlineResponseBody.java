@@ -1,14 +1,11 @@
-package com.hau.news.responseBodies;
+package com.hau.news.responsebodies;
 
 
-import com.hau.news.models.Article;
-import com.hau.news.models.EmailNewsHeadline;
-import com.hau.news.models.UserProfile;
 import lombok.Data;
 
 
 import java.time.Instant;
-import java.util.List;
+
 @Data
 public class EmailNewsHeadlineResponseBody {
     private Long oid;

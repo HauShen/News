@@ -1,6 +1,6 @@
-package com.hau.news.responseBodies;
+package com.hau.news.responsebodies;
 
-import com.hau.news.Roles.Role;
+import com.hau.news.models.roles.Role;
 import com.hau.news.models.UserProfile;
 import lombok.Data;
 

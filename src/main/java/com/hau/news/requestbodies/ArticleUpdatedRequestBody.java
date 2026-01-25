@@ -1,14 +1,14 @@
-package com.hau.news.requestBodies;
+package com.hau.news.requestbodies;
 
 import lombok.Data;
 
 @Data
-public class ArticleRequestBody {
+public class ArticleUpdatedRequestBody {
     private String title;
     private String content;
-
-    public ArticleRequestBody(String title, String content){
+    public ArticleUpdatedRequestBody(String title,String content){
         this.title = title;
         this.content = content;
     }
+
 }

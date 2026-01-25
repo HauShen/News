@@ -1,21 +1,19 @@
 package com.hau.news;
 
-import com.hau.news.Roles.Role;
+import com.hau.news.models.roles.Role;
 import com.hau.news.models.UserProfile;
 import com.hau.news.repositories.UserRepository;
-import com.hau.news.requestBodies.UserRequestBody;
-import com.hau.news.requestBodies.UserUpdatedRequestBody;
-import com.hau.news.responseBodies.UserResponseBody;
-import com.hau.news.responseBodies.UserUpdatedResponseBody;
-import com.hau.news.services.UserServiceImpl;
+import com.hau.news.requestbodies.UserRequestBody;
+import com.hau.news.requestbodies.UserUpdatedRequestBody;
+import com.hau.news.responsebodies.UserResponseBody;
+import com.hau.news.responsebodies.UserUpdatedResponseBody;
+import com.hau.news.serviceimpls.UserServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

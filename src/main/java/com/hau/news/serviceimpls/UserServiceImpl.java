@@ -1,12 +1,13 @@
-package com.hau.news.services;
+package com.hau.news.serviceimpls;
 
 import com.hau.news.models.UserProfile;
 import com.hau.news.models.exceptions.UserNotFoundException;
 import com.hau.news.repositories.UserRepository;
-import com.hau.news.requestBodies.UserRequestBody;
-import com.hau.news.requestBodies.UserUpdatedRequestBody;
-import com.hau.news.responseBodies.UserResponseBody;
-import com.hau.news.responseBodies.UserUpdatedResponseBody;
+import com.hau.news.requestbodies.UserRequestBody;
+import com.hau.news.requestbodies.UserUpdatedRequestBody;
+import com.hau.news.responsebodies.UserResponseBody;
+import com.hau.news.responsebodies.UserUpdatedResponseBody;
+import com.hau.news.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
