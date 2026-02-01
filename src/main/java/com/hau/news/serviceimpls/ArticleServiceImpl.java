@@ -39,7 +39,7 @@ public class ArticleServiceImpl implements ArticleService {
         UserProfile currentUser = userRepository.findByUserId(userId);
         if(currentUser == null){
             logger.warn("User with userId={} not found",userId);
-            throw new UserNotFoundException( "User with id " + userId + " not found");
+            throw new UserNotFoundException( "User with userId " + userId + " not found");
         }
         Article newArticle = new Article();
         newArticle.setUser(currentUser);
@@ -55,7 +55,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleRepository.findByOid(oid);
         if(article == null){
             logger.warn("Article with articleId={} not found",oid);
-            throw new ArticleNotFoundException("User with id " + oid + " not found");
+            throw new ArticleNotFoundException("Article with articleId " + oid + " not found");
         }
         return new ArticleResponseBody(article);
     }
@@ -64,7 +64,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article currentArticle = articleRepository.findByOid(oid);
         if(currentArticle == null){
             logger.warn("Article with articleId={} not found",oid);
-            throw new ArticleNotFoundException("User with id " + oid + " not found");
+            throw new ArticleNotFoundException("Article with articleId " + oid + " not found");
         }
         currentArticle.setTitle(articleUpdatedRequestBody.getTitle());
         currentArticle.setContent(articleUpdatedRequestBody.getContent());
