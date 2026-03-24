@@ -23,3 +23,8 @@ curl -X DELETE http://localhost:8080/article/delete/301
 // Swagger
 localhost:8080/swagger-ui/index.html#/
 
+//Get News
+$ curl -v -X GET http://localhost:8080/api/nytimesnews/home
+
+
+

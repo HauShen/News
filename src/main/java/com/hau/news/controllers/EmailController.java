@@ -3,6 +3,7 @@ package com.hau.news.controllers;
 import com.hau.news.services.EmailNewsHeadlineService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,5 +23,12 @@ public class EmailController {
         emailNewsHeadlineService.createTodayGmailHeadline(emailAddress);
         return "Mail sent Successfully.";
     }
+    @GetMapping("/send_nytimes_news/{emailAddress}")
+    public String sendNYTimesNewsToEmail(@PathVariable String emailAddress)throws MessagingException{
+        emailNewsHeadlineService.sendTodayNYTimesNews(emailAddress);
+        return "Mail sent Successfully.";
+    }
+
+
 
 }

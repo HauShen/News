@@ -45,5 +45,11 @@ public class UserProfile {
         this.age = age;
         this.role = role;
     }
+    public UserProfile(String userId, String name, int age)
+    {
+        this.userId = userId;
+        this.name = name;
+        this.age = age;
+    }
 
 }

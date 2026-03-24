@@ -1,5 +1,7 @@
 package com.hau.news.controllers;
 
+import com.hau.news.repositories.ArticleRepository;
+import com.hau.news.repositories.UserRepository;
 import com.hau.news.requestbodies.ArticleRequestBody;
 import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
 import com.hau.news.responsebodies.ArticleResponseBody;
@@ -27,6 +29,7 @@ public class ArticleController {
     public ArticleController(ArticleServiceImpl articlesService){
         this.articleService = articlesService;
     }
+
     @PostMapping("/create/{userId}")
     public ResponseEntity<ArticleResponseBody> createArticleByUserId(@PathVariable String userId,@RequestBody ArticleRequestBody articleRequestBody){
         ArticleResponseBody newArticle = articleService.createArticleByUserId(userId,articleRequestBody);

@@ -59,8 +59,10 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return new ArticleResponseBody(article);
     }
+
     @Override
     public ArticleUpdatedResponseBody editArticleByOid(Long oid, ArticleUpdatedRequestBody articleUpdatedRequestBody){
+       // ArticleRepository articleRepo = new ArticleRepository();
         Article currentArticle = articleRepository.findByOid(oid);
         if(currentArticle == null){
             logger.warn("Article with articleId={} not found",oid);

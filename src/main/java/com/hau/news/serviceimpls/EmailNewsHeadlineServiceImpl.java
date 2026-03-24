@@ -1,10 +1,14 @@
 package com.hau.news.serviceimpls;
 
+import com.hau.news.externalapiproperties.NYTimesProperty;
 import com.hau.news.models.Article;
+import com.hau.news.models.NYTimesArticle;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
 import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.EmailNewsHeadlineRepository;
+import com.hau.news.responsebodies.NyTimesNewsResponseBody;
 import com.hau.news.services.EmailNewsHeadlineService;
+import com.hau.news.services.NYTimesNewsClient;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -23,12 +27,16 @@ import java.util.List;
 
 @Service
 public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
-    private EmailNewsHeadlineRepository emailNewsHeadlineRepository;
-    private ArticleRepository articleRepository;
+    private final EmailNewsHeadlineRepository emailNewsHeadlineRepository;
+    private final  ArticleRepository articleRepository;
+    private final NYTimesNewsClient nyTimesNewsClient;
+    private final NYTimesProperty nyTimesProperty;
     @Autowired
-    public EmailNewsHeadlineServiceImpl(EmailNewsHeadlineRepository emailNewsHeadlineRepository,ArticleRepository articleRepository){
+    public EmailNewsHeadlineServiceImpl(EmailNewsHeadlineRepository emailNewsHeadlineRepository,ArticleRepository articleRepository,NYTimesNewsClient nyTimesNewsClient,NYTimesProperty nyTimesProperty){
         this.emailNewsHeadlineRepository = emailNewsHeadlineRepository;
         this.articleRepository = articleRepository;
+        this.nyTimesNewsClient = nyTimesNewsClient;
+        this.nyTimesProperty = nyTimesProperty;
     }
     @Autowired
     private JavaMailSender mailSender;
@@ -65,5 +73,21 @@ public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
 
         mailSender.send(mimeMessage);
 
+    }
+    @Override
+    public void sendTodayNYTimesNews(String emailAddress)throws MessagingException{
+        String emailContent = "";
+        NyTimesNewsResponseBody nyTimesNewsResponseBody = nyTimesNewsClient.getTopStories(nyTimesProperty.getKey());
+        for(NYTimesArticle nyTimesArticle : nyTimesNewsResponseBody.getResults()){
+            emailContent = emailContent + nyTimesArticle.getTitle() + "\n" + nyTimesArticle.getAbstractText() + "\n" + nyTimesArticle.getUrl() + "\n\n";
+        }
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,true);
+        mimeMessageHelper.setTo(emailAddress);
+        mimeMessageHelper.setSubject("Today breaking news!!");
+        mimeMessageHelper.setText(emailContent);
+
+        mailSender.send(mimeMessage);
     }
 }

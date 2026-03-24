@@ -63,7 +63,7 @@ public class ArticleServiceTest {
     }
     @Test
     public void updateArticleShouldInsertArticleCorrectly(){
-        Mockito.when(fakeArticleRepository.findByOid(123L)).thenReturn(expectedArticle);
+      //  Mockito.when(fakeArticleRepository.findByOid(123L)).thenReturn(expectedArticle);
         ArticleUpdatedResponseBody actualArticleUpdatedResponseBody = articlesService.editArticleByOid(123L,fakeArticleUpdatedRequestBody);
         assertThat(actualArticleUpdatedResponseBody)
                 .usingRecursiveComparison()
