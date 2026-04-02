@@ -77,7 +77,7 @@ public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
     @Override
     public void sendTodayNYTimesNews(String emailAddress)throws MessagingException{
         String emailContent = "";
-        NyTimesNewsResponseBody nyTimesNewsResponseBody = nyTimesNewsClient.getTopStories(nyTimesProperty.getKey());
+        NyTimesNewsResponseBody nyTimesNewsResponseBody = nyTimesNewsClient.getTopStories();
         for(NYTimesArticle nyTimesArticle : nyTimesNewsResponseBody.getResults()){
             emailContent = emailContent + nyTimesArticle.getTitle() + "\n" + nyTimesArticle.getAbstractText() + "\n" + nyTimesArticle.getUrl() + "\n\n";
         }

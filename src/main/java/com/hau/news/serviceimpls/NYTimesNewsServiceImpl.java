@@ -21,14 +21,24 @@ public class NYTimesNewsServiceImpl implements NewsService {
         this.nyTimesNewsClient = nyTimesNewsClient;
         this.nyTimesProperty = nyTimesProperty;
     }
-    @Override
+    /*@Override
     public List<NYTimesArticle> getTopStories(){
         NyTimesNewsResponseBody nyTimesNewsResponseBody =  nyTimesNewsClient.getTopStories(nyTimesProperty.getKey());
         if(nyTimesNewsResponseBody == null || nyTimesNewsResponseBody.getResults() == null){
             return Collections.emptyList();
         }
         return nyTimesNewsResponseBody.getResults();
+    }*/
+
+    @Override
+    public List<NYTimesArticle> getTopStories(){
+        NyTimesNewsResponseBody nyTimesNewsResponseBody =  nyTimesNewsClient.getTopStories();
+        if (nyTimesNewsResponseBody == null){
+            throw new RuntimeException("NYTimes API returned null");
+        }
+        return nyTimesNewsResponseBody.getResults();
     }
+
     @Override
     public  List<NYTimesArticle> getScienceTopStories(){
         NyTimesNewsResponseBody nyTimesNewsResponseBody = nyTimesNewsClient.getScienceTopStories(nyTimesProperty.getKey());
