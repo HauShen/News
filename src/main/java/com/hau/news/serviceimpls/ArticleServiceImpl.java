@@ -1,6 +1,7 @@
 package com.hau.news.serviceimpls;
 
 import com.hau.news.models.Article;
+import com.hau.news.models.NYTimesArticle;
 import com.hau.news.models.UserProfile;
 import com.hau.news.models.exceptions.ArticleNotFoundException;
 import com.hau.news.models.exceptions.UserNotFoundException;
@@ -10,24 +11,32 @@ import com.hau.news.requestbodies.ArticleRequestBody;
 import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
 import com.hau.news.responsebodies.ArticleResponseBody;
 import com.hau.news.responsebodies.ArticleUpdatedResponseBody;
+import com.hau.news.responsebodies.NyTimesNewsResponseBody;
 import com.hau.news.services.ArticleService;
+import com.hau.news.services.NYTimesNewsClient;
+import com.hau.news.models.NYTimesArticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
-    private ArticleRepository articleRepository;
+    private final ArticleRepository articleRepository;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final NYTimesNewsServiceImpl nyTimesNewsService;
+
     @Autowired
-    public ArticleServiceImpl(UserRepository userRepository, ArticleRepository articleRepository) {
+    public ArticleServiceImpl(UserRepository userRepository, ArticleRepository articleRepository, NYTimesNewsServiceImpl nyTimesNewsService) {
         this.userRepository = userRepository;
         this.articleRepository = articleRepository;
+        this.nyTimesNewsService = nyTimesNewsService;
+
     }
     private static final Logger logger =
             LoggerFactory.getLogger(ArticleServiceImpl.class);
@@ -79,5 +88,17 @@ public class ArticleServiceImpl implements ArticleService {
          articleRepository.deleteById(oid);
          return "This article with id " + oid +" is deleted";
     }
+
+    public Article turnsNYTimesNewsToArticle(){
+        Article article = new Article();
+        List<NYTimesArticle> nyTimesArticleList = nyTimesNewsService.getTopStories();
+        for(NYTimesArticle nyTimesArticle : nyTimesArticleList){
+            article.setTitle(nyTimesArticle.getTitle());
+            article.setContent(nyTimesArticle.getAbstractText());
+        }
+        articleRepository.save(article);
+        return article;
+    }
+    public void
 
 }

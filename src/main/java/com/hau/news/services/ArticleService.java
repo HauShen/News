@@ -1,5 +1,6 @@
 package com.hau.news.services;
 
+import com.hau.news.models.NYTimesArticle;
 import com.hau.news.requestbodies.ArticleRequestBody;
 import com.hau.news.requestbodies.ArticleUpdatedRequestBody;
 import com.hau.news.responsebodies.ArticleResponseBody;
@@ -10,5 +11,7 @@ public interface ArticleService {
     ArticleResponseBody getArticleByOid(Long oid);
     ArticleUpdatedResponseBody editArticleByOid(Long oid, ArticleUpdatedRequestBody articleUpdatedRequestBody);
     String deleteArticleByOid(Long oid);
+
+
 
 }
