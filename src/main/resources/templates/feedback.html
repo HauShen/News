@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Article - News App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .article-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+        }
+
+        .article-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .article-content {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .action-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .like-button {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            display: inline-block;
+        }
+
+        .like-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .like-button:active {
+            transform: translateY(0);
+        }
+
+        .like-button.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .like-button.loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-left: 10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 16px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .error-container {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📰 Today's Exclusive Article</h1>
+        <p>Click the button below to show your appreciation</p>
+    </div>
+
+    <div id="content"></div>
+
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div id="errorContainer" class="error-container" style="display: none;">
+        <div class="error-icon">❌</div>
+        <div id="errorMessage"></div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 News App. All rights reserved.</p>
+    </div>
+</div>
+
+<script>
+        // Get token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            showError('Invalid token. Please check your email link.');
+        } else {
+            loadArticle();
+        }
+
+        /**
+         * Load article details from backend
+         */
+        function loadArticle() {
+            showLoader(true);
+
+            fetch(`/feedback/like?token=${token}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Failed to load article');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showLoader(false);
+                    renderArticle(data);
+                })
+                .catch(error => {
+                    showLoader(false);
+                    showError(error.message);
+                });
+        }
+
+        /**
+         * Render article content
+         */
+        function renderArticle(data) {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="article-section">
+                    <div class="article-title">${escapeHtml(data.articleTitle)}</div>
+                    <div class="article-content">${escapeHtml(data.articleContent)}</div>
+                </div>
+                <div class="action-section">
+                    <button class="like-button" onclick="submitLike()">
+                        👍 Like This Article
+                    </button>
+                </div>
+                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 15px;">
+                    This link expires in 24 hours
+                </p>
+            `;
+        }
+
+        /**
+         * Submit like to backend
+         */
+        function submitLike() {
+            const button = document.querySelector('.like-button');
+            button.classList.add('loading');
+            button.disabled = true;
+
+            fetch(`/feedback/like?token=${token}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Failed to like article');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    button.classList.remove('loading');
+                    showMessage('✅ ' + data.message, 'success');
+                    button.disabled = true;
+                    button.textContent = '✅ Liked!';
+
+                    // Optional: Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                })
+                .catch(error => {
+                    button.classList.remove('loading');
+                    button.disabled = false;
+                    showMessage('❌ ' + error.message, 'error');
+                });
+        }
+
+        /**
+         * Show/hide loader
+         */
+        function showLoader(show) {
+            document.getElementById('loader').style.display = show ? 'block' : 'none';
+        }
+
+        /**
+         * Show message
+         */
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = `message ${type} show`;
+            setTimeout(() => {
+                messageEl.classList.remove('show');
+            }, 5000);
+        }
+
+        /**
+         * Show error
+         */
+        function showError(message) {
+            document.getElementById('errorContainer').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('content').style.display = 'none';
+        }
+
+        /**
+         * Escape HTML to prevent XSS
+         */
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
+
+/**
+* Load article details from backend
+*/
+function loadArticle() {
+showLoader(true);
+
+fetch(`/feedback/article?token=${encodeURIComponent(token)}`)
+.then(response => {
+if (!response.ok) {
+return response.json().then(data => {
+throw new Error(data.error || 'Failed to load article');
+});
+}
+return response.json();
+})
+.then(data => {
+showLoader(false);
+renderArticle(data);
+})
+.catch(error => {
+showLoader(false);
+console.error('Error loading article:', error);
+showError(error.message);
+});
+}
+
+/**
+* Submit like to backend
+*/
+function submitLike() {
+const button = document.querySelector('.like-button');
+button.classList.add('loading');
+button.disabled = true;
+
+fetch(`/feedback/like?token=${encodeURIComponent(token)}`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json'
+}
+})
+.then(response => {
+if (!response.ok) {
+return response.json().then(data => {
+throw new Error(data.error || 'Failed to like article');
+});
+}
+return response.json();
+})
+.then(data => {
+button.classList.remove('loading');
+showMessage('✅ ' + data.message, 'success');
+button.disabled = true;
+button.textContent = '✅ Liked!';
+
+// Redirect after 2 seconds
+setTimeout(() => {
+window.location.href = '/';
+}, 2000);
+})
+.catch(error => {
+button.classList.remove('loading');
+button.disabled = false;
+console.error('Error submitting like:', error);
+showMessage('❌ ' + error.message, 'error');
+});
+}

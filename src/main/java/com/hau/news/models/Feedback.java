@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"userId", "articleOid"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"articleOid"})})
 public class Feedback {
 
     @Id
@@ -23,11 +23,12 @@ public class Feedback {
     private Long id;
     private String userId;
     private Long articleOid;
+    private String userToken;
     private boolean liked;
 
-    public Feedback(String userId,Long articleOid, boolean liked){
-        this.userId = userId;
+    public Feedback(String userId, Long articleOid,boolean liked){
         this.articleOid = articleOid;
+        this.userToken = userToken;
         this.liked = liked;
     }
 }

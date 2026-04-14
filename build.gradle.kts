@@ -33,6 +33,7 @@ dependencies {
 	implementation ("org.springframework.boot:spring-boot-starter-mail")
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
 	implementation ("org.springframework.cloud:spring-cloud-starter-openfeign")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	runtimeOnly("org.postgresql:postgresql")
 	//runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	//runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")

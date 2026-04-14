@@ -1,6 +1,8 @@
 package com.hau.news.globalexceptionhandlers;
 
 import com.hau.news.models.exceptions.ArticleNotFoundException;
+import com.hau.news.models.exceptions.ExpiredTokenException;
+import com.hau.news.models.exceptions.InvalidTokenException;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
 import com.hau.news.models.exceptions.UserNotFoundException;
 import jakarta.mail.MessagingException;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionsHandler {
@@ -30,5 +34,18 @@ public class GlobalExceptionsHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Email system error");
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidToken(InvalidTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredToken(ExpiredTokenException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Token has expired. Please request a new newsletter."));
+    }
+
 
 }
