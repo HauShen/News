@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS feedback (
     id BIGSERIAL PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
+    reader_id VARCHAR(255) NOT NULL,  -- ✅ Change to reader_id
     article_oid BIGINT NOT NULL,
     user_token VARCHAR(500),
     liked BOOLEAN NOT NULL DEFAULT TRUE,
@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS feedback (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     -- Foreign Keys
-    CONSTRAINT fk_feedback_user
-        FOREIGN KEY (user_id)
+    CONSTRAINT fk_feedback_reader
+        FOREIGN KEY (reader_id)
         REFERENCES user_profile(user_id)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -21,25 +21,10 @@ CREATE TABLE IF NOT EXISTS feedback (
         ON UPDATE CASCADE,
 
     -- Ensure each user can like each article only once
-    CONSTRAINT uk_user_article_like UNIQUE(user_id, article_oid)
+    CONSTRAINT uk_user_article_like UNIQUE(reader_id, article_oid)
 );
 
--- Create indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_feedback_user_id
-    ON feedback(user_id);
-
-CREATE INDEX IF NOT EXISTS idx_feedback_article_oid
-    ON feedback(article_oid);
-
-CREATE INDEX IF NOT EXISTS idx_feedback_user_article
-    ON feedback(user_id, article_oid);
-
-CREATE INDEX IF NOT EXISTS idx_feedback_created_at
-    ON feedback(created_at);
-
--- Add comments to table
-COMMENT ON TABLE feedback IS 'Stores article likes/feedback from users';
-COMMENT ON COLUMN feedback.user_id IS 'ID of the user who liked the article (FK to user_profile)';
-COMMENT ON COLUMN feedback.article_oid IS 'ID of the article that was liked (FK to article)';
-COMMENT ON COLUMN feedback.user_token IS 'Token used to verify the like action';
-COMMENT ON COLUMN feedback.liked IS 'Whether the user liked (true) or disliked (false)';
+CREATE INDEX IF NOT EXISTS idx_feedback_reader_id ON feedback(reader_id);
+CREATE INDEX IF NOT EXISTS idx_feedback_article_oid ON feedback(article_oid);
+CREATE INDEX IF NOT EXISTS idx_feedback_reader_article ON feedback(reader_id, article_oid);
+CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at);

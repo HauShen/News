@@ -1,8 +1,10 @@
 package com.hau.news.controllers;
 
 import com.hau.news.models.Article;
+import com.hau.news.models.exceptions.ArticleNotFoundException;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
+import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.FeedbackRepository;
 import com.hau.news.responsebodies.ArticleResponseBody;
 import com.hau.news.serviceimpls.FeedbackTokenServiceImpl;
@@ -32,15 +34,18 @@ public class FeedbackController {
 
     private final FeedbackTokenServiceImpl feedbackTokenService;
     private final ArticleService articleService;
+    private final ArticleRepository articleRepository;
     private final FeedbackRepository feedbackRepository;
 
     @Autowired
     public FeedbackController(
             FeedbackTokenServiceImpl feedbackTokenService,
             ArticleService articleService,
+            ArticleRepository articleRepository,
             FeedbackRepository feedbackRepository) {
         this.feedbackTokenService = feedbackTokenService;
         this.articleService = articleService;
+        this.articleRepository = articleRepository;
         this.feedbackRepository = feedbackRepository;
     }
 
@@ -115,7 +120,7 @@ public class FeedbackController {
             Map<String, Object> response = Map.of(
                     "success", true,
                     "message", "Article liked successfully!",
-                    "userId", payload.userId(),
+                    "readerId", payload.userId(),
                     "articleOid", payload.articleOid()
             );
 
@@ -140,10 +145,15 @@ public class FeedbackController {
     @GetMapping("/count")
     @ResponseBody
     public ResponseEntity<?> getLikeCount(@RequestParam Long articleOid) {
+        Article article = articleRepository.findByOid(articleOid);
+        if(article == null){
+            logger.warn("Article with articleId={} not found",articleOid);
+            throw new ArticleNotFoundException("Article with articleId " + articleOid + " not found");
+        }
         try {
             logger.info("Fetching like count for articleOid: {}", articleOid);
 
-            long likeCount = feedbackRepository.countByArticleOidAndLiked(articleOid, true);
+            long likeCount = feedbackRepository.countByArticleAndLiked(article, true);
 
             return ResponseEntity.ok(Map.of(
                     "articleOid", articleOid,

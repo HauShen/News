@@ -5,7 +5,9 @@ import com.hau.news.models.Feedback;
 import com.hau.news.models.UserProfile;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
+import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.FeedbackRepository;
+import com.hau.news.repositories.UserRepository;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
@@ -36,13 +38,17 @@ public class FeedbackTokenServiceImpl {
     private int tokenExpiryHours;
 
     private final FeedbackRepository feedbackRepository;
-    private UserProfile reader;
-    private Article article;
+    private final UserRepository userRepository;
+    private final ArticleRepository articleRepository;
 
-    public FeedbackTokenServiceImpl(FeedbackRepository feedbackRepository,UserProfile reader,Article article) {
+    // ✅ CORRECT: Only inject repositories
+    public FeedbackTokenServiceImpl(
+            FeedbackRepository feedbackRepository,
+            UserRepository userRepository,
+            ArticleRepository articleRepository) {
         this.feedbackRepository = feedbackRepository;
-        this.reader = reader;
-        this.article = article;
+        this.userRepository = userRepository;
+        this.articleRepository = articleRepository;
     }
 
     /**
@@ -107,14 +113,99 @@ public class FeedbackTokenServiceImpl {
      * Saves a like for user and article
      */
     public void saveLike(String userId, Long articleOid) {
-        if (feedbackRepository.existsByUserIdAndArticleOid(userId, articleOid)) {
-            logger.info("Like already exists for userId: {}, articleOid: {}", userId, articleOid);
-            return;
-        }
+        try {
+            // ✅ Fetch entities from repositories
+            UserProfile user = userRepository.findByUserId(userId);
+            if (user == null) {
+                logger.error("User not found: {}", userId);
+                throw new RuntimeException("User not found: " + userId);
+            }
 
-        Feedback feedback = new Feedback(reader, article, true);
-        feedbackRepository.save(feedback);
-        logger.info("Like saved for userId: {}, articleOid: {}", userId, articleOid);
+            Article article = articleRepository.findByOid(articleOid);
+            if (article == null) {
+                logger.error("Article not found: {}", articleOid);
+                throw new RuntimeException("Article not found: " + articleOid);
+            }
+
+            // Check if already liked
+            if (feedbackRepository.existsByUserAndArticle(user, article)) {
+                logger.info("Like already exists for userId: {}, articleOid: {}", userId, articleOid);
+                return;
+            }
+
+            // Save like with entity references
+            Feedback feedback = new Feedback(user, article, true);
+            feedbackRepository.save(feedback);
+            logger.info("Like saved for userId: {}, articleOid: {}", userId, articleOid);
+        } catch (Exception e) {
+            logger.error("Error saving like", e);
+            throw new RuntimeException("Failed to save like: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Save like with token
+     */
+    public void saveLikeWithToken(String userId, Long articleOid, String token) {
+        try {
+            UserProfile user = userRepository.findByUserId(userId);
+            if (user == null) {
+                throw new RuntimeException("User not found: " + userId);
+            }
+
+            Article article = articleRepository.findByOid(articleOid);
+            if (article == null) {
+                throw new RuntimeException("Article not found: " + articleOid);
+            }
+
+            if (feedbackRepository.existsByUserAndArticle(user, article)) {
+                logger.info("Like already exists for userId: {}, articleOid: {}", userId, articleOid);
+                return;
+            }
+
+            Feedback feedback = new Feedback(user, article, true);
+            feedback.setUserToken(token);
+            feedbackRepository.save(feedback);
+            logger.info("Like saved with token for userId: {}, articleOid: {}", userId, articleOid);
+        } catch (Exception e) {
+            logger.error("Error saving like with token", e);
+            throw new RuntimeException("Failed to save like: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Check if user already liked this article
+     */
+    public boolean hasUserLikedArticle(String userId, Long articleOid) {
+        try {
+            UserProfile user = userRepository.findByUserId(userId);
+            Article article = articleRepository.findByOid(articleOid);
+
+            if (user == null || article == null) {
+                return false;
+            }
+
+            return feedbackRepository.existsByUserAndArticle(user, article);
+        } catch (Exception e) {
+            logger.error("Error checking like status", e);
+            return false;
+        }
+    }
+
+    /**
+     * Get like count for article
+     */
+    public long getArticleLikeCount(Long articleOid) {
+        try {
+            Article article = articleRepository.findByOid(articleOid);
+            if (article == null) {
+                return 0L;
+            }
+            return feedbackRepository.countByArticleAndLiked(article, true);
+        } catch (Exception e) {
+            logger.error("Error getting like count", e);
+            return 0L;
+        }
     }
 
     /**
@@ -134,32 +225,4 @@ public class FeedbackTokenServiceImpl {
     }
 
     public record TokenPayload(String userId, Long articleOid) {}
-    /**
-     * Check if user already liked this article
-     */
-    public boolean hasUserLikedArticle(String userId, Long articleOid) {
-        return feedbackRepository.existsByUserIdAndArticleOid(userId, articleOid);
-    }
-
-    /**
-     * Get like count for article
-     */
-    public long getArticleLikeCount(Long articleOid) {
-        return feedbackRepository.countByArticleOidAndLiked(articleOid, true);
-    }
-
-    /**
-     * Save like with more details
-     */
-    public void saveLikeWithToken(String userId, Long articleOid, String token) {
-        if (feedbackRepository.existsByUserIdAndArticleOid(userId, articleOid)) {
-            logger.info("User {} already liked article {}", userId, articleOid);
-            return;
-        }
-
-        Feedback feedback = new Feedback(reader, article, true);
-        feedback.setUserToken(token);
-        feedbackRepository.save(feedback);
-        logger.info("Like saved with token for userId: {}, articleOid: {}", userId, articleOid);
-    }
 }

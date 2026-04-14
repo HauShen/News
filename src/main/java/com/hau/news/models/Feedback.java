@@ -45,7 +45,7 @@ public class Feedback {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_feedback_user")
     )
-    private UserProfile reader;
+    private UserProfile user;
 
     // Foreign Key to Article
     @ManyToOne(fetch = FetchType.LAZY)
@@ -69,8 +69,8 @@ public class Feedback {
     private Instant updatedAt;
 
     // Constructors
-    public Feedback(UserProfile reader, Article article, boolean liked) {
-        this.reader = reader;
+    public Feedback(UserProfile user, Article article, boolean liked) {
+        this.user = user;
         this.article = article;
         this.liked = liked;
         this.createdAt = Instant.now();
