@@ -178,6 +178,7 @@
             border-radius: 4px;
             border: 1px solid #f5c6cb;
             text-align: center;
+            display: none;
         }
 
         .error-icon {
@@ -201,7 +202,7 @@
 
     <div id="message" class="message"></div>
 
-    <div id="errorContainer" class="error-container" style="display: none;">
+    <div id="errorContainer" class="error-container">
         <div class="error-icon">❌</div>
         <div id="errorMessage"></div>
     </div>
@@ -212,210 +213,153 @@
 </div>
 
 <script>
-        // Get token from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+    // Get token from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
 
-        if (!token) {
-            showError('Invalid token. Please check your email link.');
-        } else {
-            loadArticle();
-        }
+    if (!token) {
+        showError('Invalid token. Please check your email link.');
+    } else {
+        loadArticle();
+    }
 
-        /**
-         * Load article details from backend
-         */
-        function loadArticle() {
-            showLoader(true);
+    /**
+     * Load article details from backend
+     */
+    function loadArticle() {
+        showLoader(true);
+        console.log('Loading article with token:', token);
 
-            fetch(`/feedback/like?token=${token}`)
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Failed to load article');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    showLoader(false);
-                    renderArticle(data);
-                })
-                .catch(error => {
-                    showLoader(false);
-                    showError(error.message);
-                });
-        }
-
-        /**
-         * Render article content
-         */
-        function renderArticle(data) {
-            const content = document.getElementById('content');
-            content.innerHTML = `
-                <div class="article-section">
-                    <div class="article-title">${escapeHtml(data.articleTitle)}</div>
-                    <div class="article-content">${escapeHtml(data.articleContent)}</div>
-                </div>
-                <div class="action-section">
-                    <button class="like-button" onclick="submitLike()">
-                        👍 Like This Article
-                    </button>
-                </div>
-                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 15px;">
-                    This link expires in 24 hours
-                </p>
-            `;
-        }
-
-        /**
-         * Submit like to backend
-         */
-        function submitLike() {
-            const button = document.querySelector('.like-button');
-            button.classList.add('loading');
-            button.disabled = true;
-
-            fetch(`/feedback/like?token=${token}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+        // CORRECT URL: Call /feedback/article?token=...
+        fetch(`/feedback/article?token=${encodeURIComponent(token)}`)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to load article');
+                    });
                 }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Failed to like article');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    button.classList.remove('loading');
-                    showMessage('✅ ' + data.message, 'success');
-                    button.disabled = true;
-                    button.textContent = '✅ Liked!';
+            .then(data => {
+                console.log('Article data received:', data);
+                showLoader(false);
+                renderArticle(data);
+            })
+            .catch(error => {
+                console.error('Error loading article:', error);
+                showLoader(false);
+                showError(error.message);
+            });
+    }
 
-                    // Optional: Redirect after 2 seconds
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 2000);
-                })
-                .catch(error => {
-                    button.classList.remove('loading');
-                    button.disabled = false;
-                    showMessage('❌ ' + error.message, 'error');
-                });
-        }
+    /**
+     * Render article content
+     */
+    function renderArticle(data) {
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <div class="article-section">
+                <div class="article-title">${escapeHtml(data.articleTitle)}</div>
+                <div class="article-content">${escapeHtml(data.articleContent)}</div>
+            </div>
+            <div class="action-section">
+                <button class="like-button" onclick="submitLike()">
+                    👍 Like This Article
+                </button>
+            </div>
+            <p style="text-align: center; color: #999; font-size: 12px; margin-top: 15px;">
+                This link expires in 24 hours
+            </p>
+        `;
+    }
 
-        /**
-         * Show/hide loader
-         */
-        function showLoader(show) {
-            document.getElementById('loader').style.display = show ? 'block' : 'none';
-        }
+    /**
+     * Submit like to backend
+     */
+    function submitLike() {
+        const button = document.querySelector('.like-button');
+        button.classList.add('loading');
+        button.disabled = true;
 
-        /**
-         * Show message
-         */
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = `message ${type} show`;
-            setTimeout(() => {
-                messageEl.classList.remove('show');
-            }, 5000);
-        }
+        console.log('Submitting like with token:', token);
 
-        /**
-         * Show error
-         */
-        function showError(message) {
-            document.getElementById('errorContainer').style.display = 'block';
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('content').style.display = 'none';
-        }
+        fetch(`/feedback/like?token=${encodeURIComponent(token)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                console.log('Like response status:', response.status);
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to like article');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Like saved successfully:', data);
+                button.classList.remove('loading');
+                showMessage('✅ ' + data.message, 'success');
+                button.disabled = true;
+                button.textContent = '✅ Liked!';
 
-        /**
-         * Escape HTML to prevent XSS
-         */
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
-    </script>
+                // Redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error submitting like:', error);
+                button.classList.remove('loading');
+                button.disabled = false;
+                showMessage('❌ ' + error.message, 'error');
+            });
+    }
+
+    /**
+     * Show/hide loader
+     */
+    function showLoader(show) {
+        document.getElementById('loader').style.display = show ? 'block' : 'none';
+    }
+
+    /**
+     * Show message
+     */
+    function showMessage(text, type) {
+        const messageEl = document.getElementById('message');
+        messageEl.textContent = text;
+        messageEl.className = `message ${type} show`;
+        setTimeout(() => {
+            messageEl.classList.remove('show');
+        }, 5000);
+    }
+
+    /**
+     * Show error
+     */
+    function showError(message) {
+        document.getElementById('errorContainer').style.display = 'block';
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('content').style.display = 'none';
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+</script>
 </body>
 </html>
-
-/**
-* Load article details from backend
-*/
-function loadArticle() {
-showLoader(true);
-
-fetch(`/feedback/article?token=${encodeURIComponent(token)}`)
-.then(response => {
-if (!response.ok) {
-return response.json().then(data => {
-throw new Error(data.error || 'Failed to load article');
-});
-}
-return response.json();
-})
-.then(data => {
-showLoader(false);
-renderArticle(data);
-})
-.catch(error => {
-showLoader(false);
-console.error('Error loading article:', error);
-showError(error.message);
-});
-}
-
-/**
-* Submit like to backend
-*/
-function submitLike() {
-const button = document.querySelector('.like-button');
-button.classList.add('loading');
-button.disabled = true;
-
-fetch(`/feedback/like?token=${encodeURIComponent(token)}`, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/json'
-}
-})
-.then(response => {
-if (!response.ok) {
-return response.json().then(data => {
-throw new Error(data.error || 'Failed to like article');
-});
-}
-return response.json();
-})
-.then(data => {
-button.classList.remove('loading');
-showMessage('✅ ' + data.message, 'success');
-button.disabled = true;
-button.textContent = '✅ Liked!';
-
-// Redirect after 2 seconds
-setTimeout(() => {
-window.location.href = '/';
-}, 2000);
-})
-.catch(error => {
-button.classList.remove('loading');
-button.disabled = false;
-console.error('Error submitting like:', error);
-showMessage('❌ ' + error.message, 'error');
-});
-}

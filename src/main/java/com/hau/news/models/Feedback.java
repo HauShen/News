@@ -1,34 +1,90 @@
 package com.hau.news.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
+import java.time.Instant;
+
 @Data
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"articleOid"})})
+@NoArgsConstructor
+@Table(
+        name = "feedback",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_user_article_like",
+                        columnNames = {"user_id", "article_oid"}
+                )
+        }
+)
 public class Feedback {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String userId;
-    private Long articleOid;
+
+    // Foreign Key to UserProfile
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_feedback_user")
+    )
+    private UserProfile reader;
+
+    // Foreign Key to Article
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "article_oid",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "fk_feedback_article")
+    )
+    private Article article;
+
+    @Column(name = "user_token")
     private String userToken;
+
+    @Column(nullable = false)
     private boolean liked;
 
-    public Feedback(String userId, Long articleOid,boolean liked){
-        this.articleOid = articleOid;
-        this.userToken = userToken;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    // Constructors
+    public Feedback(UserProfile reader, Article article, boolean liked) {
+        this.reader = reader;
+        this.article = article;
         this.liked = liked;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
     }
 }

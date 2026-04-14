@@ -1,6 +1,8 @@
 package com.hau.news.serviceimpls;
 
+import com.hau.news.models.Article;
 import com.hau.news.models.Feedback;
+import com.hau.news.models.UserProfile;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
 import com.hau.news.repositories.FeedbackRepository;
@@ -34,9 +36,13 @@ public class FeedbackTokenServiceImpl {
     private int tokenExpiryHours;
 
     private final FeedbackRepository feedbackRepository;
+    private UserProfile reader;
+    private Article article;
 
-    public FeedbackTokenServiceImpl(FeedbackRepository feedbackRepository) {
+    public FeedbackTokenServiceImpl(FeedbackRepository feedbackRepository,UserProfile reader,Article article) {
         this.feedbackRepository = feedbackRepository;
+        this.reader = reader;
+        this.article = article;
     }
 
     /**
@@ -106,7 +112,7 @@ public class FeedbackTokenServiceImpl {
             return;
         }
 
-        Feedback feedback = new Feedback(userId, articleOid, true);
+        Feedback feedback = new Feedback(reader, article, true);
         feedbackRepository.save(feedback);
         logger.info("Like saved for userId: {}, articleOid: {}", userId, articleOid);
     }
@@ -128,4 +134,32 @@ public class FeedbackTokenServiceImpl {
     }
 
     public record TokenPayload(String userId, Long articleOid) {}
+    /**
+     * Check if user already liked this article
+     */
+    public boolean hasUserLikedArticle(String userId, Long articleOid) {
+        return feedbackRepository.existsByUserIdAndArticleOid(userId, articleOid);
+    }
+
+    /**
+     * Get like count for article
+     */
+    public long getArticleLikeCount(Long articleOid) {
+        return feedbackRepository.countByArticleOidAndLiked(articleOid, true);
+    }
+
+    /**
+     * Save like with more details
+     */
+    public void saveLikeWithToken(String userId, Long articleOid, String token) {
+        if (feedbackRepository.existsByUserIdAndArticleOid(userId, articleOid)) {
+            logger.info("User {} already liked article {}", userId, articleOid);
+            return;
+        }
+
+        Feedback feedback = new Feedback(reader, article, true);
+        feedback.setUserToken(token);
+        feedbackRepository.save(feedback);
+        logger.info("Like saved with token for userId: {}, articleOid: {}", userId, articleOid);
+    }
 }

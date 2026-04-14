@@ -3,6 +3,7 @@ package com.hau.news.controllers;
 import com.hau.news.models.Article;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
+import com.hau.news.repositories.FeedbackRepository;
 import com.hau.news.responsebodies.ArticleResponseBody;
 import com.hau.news.serviceimpls.FeedbackTokenServiceImpl;
 import com.hau.news.services.ArticleService;
@@ -31,13 +32,16 @@ public class FeedbackController {
 
     private final FeedbackTokenServiceImpl feedbackTokenService;
     private final ArticleService articleService;
+    private final FeedbackRepository feedbackRepository;
 
     @Autowired
     public FeedbackController(
             FeedbackTokenServiceImpl feedbackTokenService,
-            ArticleService articleService) {
+            ArticleService articleService,
+            FeedbackRepository feedbackRepository) {
         this.feedbackTokenService = feedbackTokenService;
         this.articleService = articleService;
+        this.feedbackRepository = feedbackRepository;
     }
 
     /**
@@ -48,25 +52,23 @@ public class FeedbackController {
     public String openFeedbackPage(@RequestParam String token) {
         try {
             logger.info("Opening feedback page with token");
-            // Validate token exists and is properly formatted
             feedbackTokenService.validateToken(token);
-            // Return Thymeleaf template name
             return "feedback";
         } catch (Exception e) {
             logger.warn("Invalid token provided: {}", e.getMessage());
-            return "feedback"; // Still serve the page, let JavaScript handle validation
+            return "feedback";
         }
     }
 
     /**
      * REST API: GET /feedback/article?token=XXX
-     * Returns article details as JSON for the webpage to display
+     * Returns article details as JSON
      */
     @GetMapping("/article")
     @ResponseBody
     public ResponseEntity<?> getArticleForFeedback(@RequestParam String token) {
         try {
-            logger.info("Fetching article details for feedback");
+            logger.info("Fetching article details for feedback with token");
 
             FeedbackTokenServiceImpl.TokenPayload payload = feedbackTokenService.validateToken(token);
             ArticleResponseBody article = articleService.getArticleByOid(payload.articleOid());
@@ -133,6 +135,24 @@ public class FeedbackController {
             logger.error("Error submitting like", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to like article: " + e.getMessage()));
+        }
+    }
+    @GetMapping("/count")
+    @ResponseBody
+    public ResponseEntity<?> getLikeCount(@RequestParam Long articleOid) {
+        try {
+            logger.info("Fetching like count for articleOid: {}", articleOid);
+
+            long likeCount = feedbackRepository.countByArticleOidAndLiked(articleOid, true);
+
+            return ResponseEntity.ok(Map.of(
+                    "articleOid", articleOid,
+                    "likeCount", likeCount
+            ));
+        } catch (Exception e) {
+            logger.error("Error fetching like count", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }
