@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -88,17 +89,23 @@ public class ArticleServiceImpl implements ArticleService {
          articleRepository.deleteById(oid);
          return "This article with id " + oid +" is deleted";
     }
+    @Override
+    public Article turnsAndSavesNYTimesNewsToArticle(String userId){
+        UserProfile currentUser = userRepository.findByUserId(userId);
+        if(currentUser == null){
+            logger.warn("User with userId={} not found",userId);
+            throw new UserNotFoundException( "User with userId " + userId + " not found");
+        }
 
-    public Article turnsNYTimesNewsToArticle(){
         Article article = new Article();
         List<NYTimesArticle> nyTimesArticleList = nyTimesNewsService.getTopStories();
-        for(NYTimesArticle nyTimesArticle : nyTimesArticleList){
-            article.setTitle(nyTimesArticle.getTitle());
-            article.setContent(nyTimesArticle.getAbstractText());
-        }
+        article.setUser(currentUser);
+        article.setTitle(nyTimesArticleList.get(0).getTitle());
+        article.setContent(nyTimesArticleList.get(0).getAbstractText());
+
         articleRepository.save(article);
         return article;
     }
-    public void
+
 
 }

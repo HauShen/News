@@ -6,7 +6,9 @@ import com.hau.news.models.NYTimesArticle;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
 import com.hau.news.repositories.ArticleRepository;
 import com.hau.news.repositories.EmailNewsHeadlineRepository;
+import com.hau.news.repositories.FeedbackRepository;
 import com.hau.news.responsebodies.NyTimesNewsResponseBody;
+import com.hau.news.services.ArticleService;
 import com.hau.news.services.EmailNewsHeadlineService;
 import com.hau.news.services.NYTimesNewsClient;
 import jakarta.mail.MessagingException;
@@ -31,12 +33,25 @@ public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
     private final  ArticleRepository articleRepository;
     private final NYTimesNewsClient nyTimesNewsClient;
     private final NYTimesProperty nyTimesProperty;
+    private final ArticleService articleService;
+    private final FeedbackTokenServiceImpl tokenService;
+    private final FeedbackRepository feedbackRepository;
     @Autowired
-    public EmailNewsHeadlineServiceImpl(EmailNewsHeadlineRepository emailNewsHeadlineRepository,ArticleRepository articleRepository,NYTimesNewsClient nyTimesNewsClient,NYTimesProperty nyTimesProperty){
+    public EmailNewsHeadlineServiceImpl(
+            EmailNewsHeadlineRepository emailNewsHeadlineRepository,
+            ArticleRepository articleRepository,
+            NYTimesNewsClient nyTimesNewsClient,
+            NYTimesProperty nyTimesProperty,
+            ArticleService articleService,
+            FeedbackTokenServiceImpl tokenService,
+            FeedbackRepository feedbackRepository){
         this.emailNewsHeadlineRepository = emailNewsHeadlineRepository;
         this.articleRepository = articleRepository;
         this.nyTimesNewsClient = nyTimesNewsClient;
         this.nyTimesProperty = nyTimesProperty;
+        this.articleService = articleService;
+        this.tokenService = tokenService;
+        this.feedbackRepository = feedbackRepository;
     }
     @Autowired
     private JavaMailSender mailSender;
@@ -90,4 +105,24 @@ public class EmailNewsHeadlineServiceImpl implements EmailNewsHeadlineService {
 
         mailSender.send(mimeMessage);
     }
+    public void sendEmailWithFeedback(String emailAddress,String userId)throws MessagingException{
+        Article article = articleService.turnsAndSavesNYTimesNewsToArticle(userId);
+        String token = tokenService.generateToken(userId,article.getOid());
+        String link = "http://localhost:8080/feedback/like?token=" + token;
+        String emailContent = "";
+        emailContent = emailContent + article.getTitle() + "\n" + article.getContent() + "\n" + link;
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,true);
+        mimeMessageHelper.setTo(emailAddress);
+        mimeMessageHelper.setSubject("Today breaking news!!");
+        mimeMessageHelper.setText(emailContent);
+
+        mailSender.send(mimeMessage);
+    }
+
+
+
+
 }
