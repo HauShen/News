@@ -16,6 +16,7 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 const TOAST_DURATION = 3000;
+let toastIdCounter = 0;
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -23,7 +24,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       showToast: (message: string, type: ToastType = "success") => {
-        const item = { id: Date.now(), message, type };
+        toastIdCounter += 1;
+        const item = { id: toastIdCounter, message, type };
         setToasts((current) => [...current, item]);
         setTimeout(() => {
           setToasts((current) => current.filter((toast) => toast.id !== item.id));
