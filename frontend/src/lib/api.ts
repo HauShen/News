@@ -78,10 +78,13 @@ export const articleApi = {
     }),
   getById: (id: string | number) => apiRequest<ArticleResponse>(`/article/get/${id}`),
   update: (id: string | number, body: UpdateArticleRequest) =>
-    apiRequest<ArticleUpdatedResponse>(`/article/edit/${id}`, {
+    apiRequest<ArticleUpdatedResponse & { oId?: number }>(`/article/edit/${id}`, {
       method: "PUT",
       body: JSON.stringify(body),
-    }),
+    }).then((response) => ({
+      ...response,
+      oid: response.oid ?? response.oId ?? Number(id),
+    })),
   delete: (id: string | number) =>
     apiRequest<string>(`/article/delete/${id}`, {
       method: "DELETE",
