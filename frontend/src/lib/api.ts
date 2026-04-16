@@ -46,7 +46,11 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
 
   const contentType = response.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
-    return (await response.json()) as T;
+    const data = (await response.json()) as unknown;
+    if (data && typeof data === "object" && "oId" in data && !("oid" in data)) {
+      (data as Record<string, unknown>).oid = (data as Record<string, unknown>).oId;
+    }
+    return data as T;
   }
 
   return (await response.text()) as T;
@@ -78,13 +82,10 @@ export const articleApi = {
     }),
   getById: (id: string | number) => apiRequest<ArticleResponse>(`/article/get/${id}`),
   update: (id: string | number, body: UpdateArticleRequest) =>
-    apiRequest<ArticleUpdatedResponse & { oId?: number }>(`/article/edit/${id}`, {
+    apiRequest<ArticleUpdatedResponse>(`/article/edit/${id}`, {
       method: "PUT",
       body: JSON.stringify(body),
-    }).then((response) => ({
-      ...response,
-      oid: response.oid ?? response.oId ?? Number(id),
-    })),
+    }),
   delete: (id: string | number) =>
     apiRequest<string>(`/article/delete/${id}`, {
       method: "DELETE",

@@ -20,7 +20,7 @@ export interface ArticleResponse {
 
 export interface ArticleUpdatedResponse {
   oid: number;
-  title?: string;
+  title: string;
   content: string;
   createdAt: string;
   updatedAt?: string;
