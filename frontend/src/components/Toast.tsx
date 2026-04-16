@@ -15,6 +15,7 @@ interface ToastContextValue {
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
+const TOAST_DURATION = 3200;
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -26,7 +27,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         setToasts((current) => [...current, item]);
         setTimeout(() => {
           setToasts((current) => current.filter((toast) => toast.id !== item.id));
-        }, 3200);
+        }, TOAST_DURATION);
       },
     }),
     [],
