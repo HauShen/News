@@ -47,8 +47,8 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const contentType = response.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
     const data = (await response.json()) as unknown;
-    // `/article/edit/{oid}` currently returns `oId` from backend; normalize to `oid` to keep frontend types consistent.
-    // This keeps existing API compatibility until backend response fields are standardized.
+    // TODO: Remove once backend standardizes `/article/edit/{oid}` response field from `oId` to `oid`.
+    // Current normalization preserves compatibility while keeping frontend types consistent.
     if (data && typeof data === "object" && "oId" in data && !("oid" in data)) {
       (data as Record<string, unknown>).oid = (data as Record<string, unknown>).oId;
     }
