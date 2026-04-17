@@ -1,0 +1,178 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
+  background: #f5f6fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+main {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page h1 {
+  margin-bottom: 1.5rem;
+  color: #1a1a2e;
+}
+
+/* Card grid for homepage */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+}
+
+/* Form sections */
+.form-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.form-section h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
+  color: #1a1a2e;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+input,
+textarea,
+select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 160px;
+}
+
+textarea {
+  width: 100%;
+}
+
+button {
+  padding: 0.5rem 1.25rem;
+  background: #1a1a2e;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background: #2d2d5e;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: #c0392b;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #e74c3c;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Results & errors */
+.result-box {
+  background: #eafaf1;
+  border: 1px solid #27ae60;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.result-box pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.85rem;
+}
+
+.error-box {
+  background: #fdedec;
+  border: 1px solid #e74c3c;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #c0392b;
+}
+
+.loading {
+  color: #777;
+  font-style: italic;
+}
+
+/* News cards */
+.news-list {
+  margin-top: 1rem;
+}
+
+.news-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.news-card h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.news-card p {
+  color: #555;
+  margin-bottom: 0.5rem;
+}
+
+.news-card a {
+  color: #2980b9;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.news-card a:hover {
+  text-decoration: underline;
+}
