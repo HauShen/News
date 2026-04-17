@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,7 +59,7 @@ public class UserProfileServiceTest {
     @Test
     public void getUserByIdOrThrow_whenNotFound_shouldThrowException() {
         Mockito.when(fakeUserRepository.findByUserId("999")).thenReturn(null);
-        org.junit.jupiter.api.Assertions.assertThrows(
+        assertThrows(
                 com.hau.news.models.exceptions.UserNotFoundException.class,
                 () -> userServiceImpl.getUserByIdOrThrow("999")
         );
