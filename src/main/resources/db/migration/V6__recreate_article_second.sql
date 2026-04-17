@@ -1,4 +1,4 @@
-CREATE TABLE article (
+CREATE TABLE IF NOT EXISTS article (
     oid BIGINT PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,

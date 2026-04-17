@@ -51,3 +51,31 @@ dependencyManagement {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+// ---- Frontend build integration ----
+val frontendDir = file("frontend")
+
+val installFrontend = tasks.register<Exec>("installFrontend") {
+	workingDir = frontendDir
+	commandLine("npm", "install")
+	inputs.file(frontendDir.resolve("package.json"))
+	inputs.file(frontendDir.resolve("package-lock.json"))
+	outputs.dir(frontendDir.resolve("node_modules"))
+}
+
+val buildFrontend = tasks.register<Exec>("buildFrontend") {
+	dependsOn(installFrontend)
+	workingDir = frontendDir
+	commandLine("npm", "run", "build")
+	inputs.dir(frontendDir.resolve("src"))
+	inputs.file(frontendDir.resolve("index.html"))
+	inputs.file(frontendDir.resolve("vite.config.js"))
+	outputs.dir(frontendDir.resolve("dist"))
+}
+
+tasks.named<Copy>("processResources") {
+	dependsOn(buildFrontend)
+	from(frontendDir.resolve("dist")) {
+		into("static")
+	}
+}
