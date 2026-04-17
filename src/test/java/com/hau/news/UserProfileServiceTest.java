@@ -54,6 +54,16 @@ public class UserProfileServiceTest {
                 .ignoringFields("userId")
                 .isEqualTo(expectedUserResponseBody);
     }
+
+    @Test
+    public void getUserByIdOrThrow_whenNotFound_shouldThrowException() {
+        Mockito.when(fakeUserRepository.findByUserId("999")).thenReturn(null);
+        org.junit.jupiter.api.Assertions.assertThrows(
+                com.hau.news.models.exceptions.UserNotFoundException.class,
+                () -> userServiceImpl.getUserByIdOrThrow("999")
+        );
+    }
+
     @Test
     public void updateUserDetailsByIdShouldEditCorrectly(){
         Mockito.when(fakeUserRepository.findByUserId("123")).thenReturn(expectedUserProfile);
