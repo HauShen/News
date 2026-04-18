@@ -28,7 +28,7 @@ import java.time.Instant;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_user_article_like",
-                        columnNames = {"user_id", "article_oid"}
+                        columnNames = {"reader_id", "article_oid"}
                 )
         }
 )
@@ -41,9 +41,9 @@ public class Feedback {
     // Foreign Key to UserProfile
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
-            name = "user_id",
+            name = "reader_id",
             nullable = false,
-            foreignKey = @ForeignKey(name = "fk_feedback_user")
+            foreignKey = @ForeignKey(name = "fk_feedback_reader")
     )
     private UserProfile user;
 
