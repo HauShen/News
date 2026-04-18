@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
+import { AuthProvider } from "@/lib/auth-context";
 import { ToastProvider } from "@/components/Toast";
 import "./globals.css";
 
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className="h-full">
-        <ToastProvider>
-          <AppShell>{children}</AppShell>
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <AppShell>{children}</AppShell>
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

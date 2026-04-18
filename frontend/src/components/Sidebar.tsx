@@ -2,16 +2,30 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
-const links = [
+const publicLinks = [
   { href: "/", label: "Home" },
   { href: "/science", label: "Science" },
+];
+
+const authenticatedLinks = [
   { href: "/dashboard", label: "Dashboard" },
+];
+
+const adminLinks = [
   { href: "/users", label: "Users" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user, isAuthenticated } = useAuth();
+
+  const links = [
+    ...publicLinks,
+    ...(isAuthenticated ? authenticatedLinks : []),
+    ...(isAuthenticated && user?.role === "ADMIN" ? adminLinks : []),
+  ];
 
   return (
     <aside className="w-full border-b border-slate-200 bg-slate-900 px-4 py-4 text-slate-100 md:min-h-screen md:w-64 md:border-b-0 md:border-r">

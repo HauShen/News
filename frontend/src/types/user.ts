@@ -1,4 +1,4 @@
-export type UserRole = "NEWS_POSTER" | "READER" | "EMAIL_CREATOR";
+export type UserRole = "ADMIN" | "NEWS_POSTER" | "READER";
 
 export interface CreateUserRequest {
   name: string;
@@ -15,6 +15,7 @@ export interface UpdateUserRequest {
 export interface UserResponse {
   userId: string;
   name: string;
+  email: string;
   age: number;
   role: UserRole;
 }

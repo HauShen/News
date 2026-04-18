@@ -1,18 +1,23 @@
 import type {
   ArticleResponse,
   ArticleUpdatedResponse,
+  AuthResponse,
   CreateArticleRequest,
   CreateUserRequest,
   FeedbackArticleResponse,
   FeedbackLikeResponse,
+  LoginRequest,
   NewsStory,
   SendWithFeedbackParams,
+  SignupRequest,
   UpdateArticleRequest,
   UpdateUserRequest,
   UserResponse,
 } from "@/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
+const AUTH_STORAGE_KEY = "news_auth";
 
 class ApiError extends Error {
   status: number;
@@ -24,19 +29,45 @@ class ApiError extends Error {
   }
 }
 
+function getStoredToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as AuthResponse;
+      return parsed.token;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getStoredToken();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...((init?.headers as Record<string, string>) ?? {}),
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
+    headers,
     cache: "no-store",
   });
 
   if (!response.ok) {
     const text = await response.text();
-    const message = text || `Request failed with status ${response.status}`;
+    let message = text || `Request failed with status ${response.status}`;
+    try {
+      const json = JSON.parse(text);
+      if (json.error) message = json.error;
+    } catch {
+      // use text as-is
+    }
     throw new ApiError(message, response.status);
   }
 
@@ -57,6 +88,19 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
 
   return (await response.text()) as T;
 }
+
+export const authApi = {
+  signup: (body: SignupRequest) =>
+    apiRequest<AuthResponse>("/auth/signup", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  login: (body: LoginRequest) =>
+    apiRequest<AuthResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+};
 
 export const userApi = {
   create: (body: CreateUserRequest) =>
