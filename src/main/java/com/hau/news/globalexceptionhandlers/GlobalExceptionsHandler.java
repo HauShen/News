@@ -6,9 +6,9 @@ import com.hau.news.models.exceptions.InvalidTokenException;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
 import com.hau.news.models.exceptions.UserNotFoundException;
 import jakarta.mail.MessagingException;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -47,5 +47,9 @@ public class GlobalExceptionsHandler {
                 .body(Map.of("error", "Token has expired. Please request a new newsletter."));
     }
 
-
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "Access denied. You don't have permission to perform this action."));
+    }
 }

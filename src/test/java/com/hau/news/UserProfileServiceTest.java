@@ -14,39 +14,49 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 public class UserProfileServiceTest {
 
     @Mock
     private UserRepository fakeUserRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @InjectMocks
     private UserServiceImpl userServiceImpl;
-    private UserProfile expectedUserProfile = new UserProfile("123","John",12, Role.READER);
-    private UserProfile expectedUpadtedUserProfile = new UserProfile("123","John",13, Role.READER);
-    private UserResponseBody expectedUserResponseBody = new UserResponseBody(expectedUserProfile);
-    private UserUpdatedResponseBody expectedUserUpdatedResponseBody =  new UserUpdatedResponseBody(expectedUpadtedUserProfile);
-    private UserRequestBody fakeUserRequestBody = new UserRequestBody("John",12, Role.READER);
-    private UserUpdatedRequestBody fakeUpdatedUserRequestBody = new UserUpdatedRequestBody("John",13,Role.READER);
 
+    private UserProfile createTestUser(String userId, String name, int age, Role role) {
+        UserProfile user = new UserProfile(userId, name, age, role);
+        user.setEmail(userId + "@test.com");
+        user.setPassword("encoded-password");
+        return user;
+    }
 
+    private final UserProfile expectedUserProfile = createTestUser("123", "John", 12, Role.READER);
+    private final UserProfile expectedUpdatedUserProfile = createTestUser("123", "John", 13, Role.READER);
+    private final UserResponseBody expectedUserResponseBody = new UserResponseBody(expectedUserProfile);
+    private final UserUpdatedResponseBody expectedUserUpdatedResponseBody = new UserUpdatedResponseBody(expectedUpdatedUserProfile);
+    private final UserRequestBody fakeUserRequestBody = new UserRequestBody("John", 12, Role.READER);
+    private final UserUpdatedRequestBody fakeUpdatedUserRequestBody = new UserUpdatedRequestBody("John", 13, Role.READER);
 
     @Test
-    public void createUserShouldInsertCorrectly(){
-//        Mockito.when(fakeUserRepository.save(Mockito.any(User.class)))
-//                .thenAnswer(invocation -> invocation.getArgument(0));
+    public void createUserShouldInsertCorrectly() {
+        Mockito.when(passwordEncoder.encode(anyString())).thenReturn("encoded-password");
         Mockito.when(fakeUserRepository.save(any(UserProfile.class))).thenReturn(expectedUserProfile);
         UserResponseBody actualUserResponseBody = userServiceImpl.createUser(fakeUserRequestBody);
         assertThat(actualUserResponseBody)
                 .usingRecursiveComparison()
-                .ignoringFields("userId")
+                .ignoringFields("userId", "email")
                 .isEqualTo(expectedUserResponseBody);
     }
+
     @Test
-    public void getUserByIdShouldGetCorrectUser(){
+    public void getUserByIdShouldGetCorrectUser() {
         Mockito.when(fakeUserRepository.findByUserId("123")).thenReturn(expectedUserProfile);
         UserResponseBody actualUserResponseBody = userServiceImpl.getUserByIdOrThrow("123");
         assertThat(actualUserResponseBody)
@@ -54,23 +64,21 @@ public class UserProfileServiceTest {
                 .ignoringFields("userId")
                 .isEqualTo(expectedUserResponseBody);
     }
+
     @Test
-    public void updateUserDetailsByIdShouldEditCorrectly(){
+    public void updateUserDetailsByIdShouldEditCorrectly() {
         Mockito.when(fakeUserRepository.findByUserId("123")).thenReturn(expectedUserProfile);
-        UserUpdatedResponseBody actualUserUpdatedResponseBody =  userServiceImpl.updateUserDetailsById("123",fakeUpdatedUserRequestBody);
+        UserUpdatedResponseBody actualUserUpdatedResponseBody = userServiceImpl.updateUserDetailsById("123", fakeUpdatedUserRequestBody);
         assertThat(actualUserUpdatedResponseBody)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedUserUpdatedResponseBody);
-
     }
 
     @Test
-    public void deleteUserByUserIdShouldDeleteCorrectly(){
+    public void deleteUserByUserIdShouldDeleteCorrectly() {
         String actualDeleteUser = userServiceImpl.deleteUserById("123");
-        Mockito.verify(fakeUserRepository,Mockito.times(1)).deleteById("123");
+        Mockito.verify(fakeUserRepository, Mockito.times(1)).deleteById("123");
         assertThat("User with Id 123 is deleted")
                 .isEqualTo(actualDeleteUser);
-
     }
-
 }

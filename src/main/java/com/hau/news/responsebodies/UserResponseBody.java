@@ -7,14 +7,15 @@ import lombok.Data;
 public class UserResponseBody {
     private String userId;
     private String name;
+    private String email;
     private int age;
     private Role role;
 
     public UserResponseBody(UserProfile userProfile){
-    this.userId = userProfile.getUserId();
-    this.name = userProfile.getName();
-    this.age = userProfile.getAge();
-    this.role = userProfile.getRole();
-
+        this.userId = userProfile.getUserId();
+        this.name = userProfile.getName();
+        this.email = userProfile.getEmail();
+        this.age = userProfile.getAge();
+        this.role = userProfile.getRole();
     }
 }

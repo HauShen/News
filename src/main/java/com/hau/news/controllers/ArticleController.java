@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,7 @@ public class ArticleController {
         this.articleService = articlesService;
     }
 
+    @PreAuthorize("hasAnyRole('NEWS_POSTER', 'ADMIN')")
     @PostMapping("/create/{userId}")
     public ResponseEntity<ArticleResponseBody> createArticleByUserId(@PathVariable String userId,@RequestBody ArticleRequestBody articleRequestBody){
         ArticleResponseBody newArticle = articleService.createArticleByUserId(userId,articleRequestBody);
@@ -39,12 +41,14 @@ public class ArticleController {
     public ResponseEntity<ArticleResponseBody> getArticleByOid(@PathVariable Long oid){
         return ResponseEntity.ok(articleService.getArticleByOid(oid)) ;
     }
+    @PreAuthorize("hasAnyRole('NEWS_POSTER', 'ADMIN')")
     @PutMapping("/edit/{oid}")
     public ResponseEntity<ArticleUpdatedResponseBody> editArticleByOid(@PathVariable Long oid, @RequestBody ArticleUpdatedRequestBody articleUpdatedRequestBody){
         ArticleUpdatedResponseBody updatedArticle = articleService.editArticleByOid(oid, articleUpdatedRequestBody);
         return ResponseEntity.ok(updatedArticle);
     }
 
+    @PreAuthorize("hasAnyRole('NEWS_POSTER', 'ADMIN')")
     @DeleteMapping("/delete/{oid}")
     public String deleteArticleByOid(@PathVariable Long oid){
         return articleService.deleteArticleByOid(oid);

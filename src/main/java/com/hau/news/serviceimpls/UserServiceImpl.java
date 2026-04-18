@@ -11,6 +11,7 @@ import com.hau.news.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -19,16 +20,21 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     private static final Logger logger =
             LoggerFactory.getLogger(UserServiceImpl.class);
+
     @Override
-    public UserResponseBody createUser(UserRequestBody userRequestBody){
+    public UserResponseBody createUser(UserRequestBody userRequestBody) {
         UserProfile newUserProfile = new UserProfile();
-        //if(newUser.getUserId() == null){}
-        newUserProfile.setUserId(UUID.randomUUID().toString());
+        String id = UUID.randomUUID().toString();
+        newUserProfile.setUserId(id);
         newUserProfile.setName(userRequestBody.getName());
         newUserProfile.setAge(userRequestBody.getAge());
         newUserProfile.setRole(userRequestBody.getRole());
+        newUserProfile.setEmail(id + "@news-app.local");
+        newUserProfile.setPassword(passwordEncoder.encode("changeme"));
         logger.info("User created with id={}", newUserProfile.getUserId());
         logger.debug("User details: name={}, age={}, role={}",
                 newUserProfile.getName(),
@@ -37,21 +43,23 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUserProfile);
         return new UserResponseBody(newUserProfile);
     }
+
     @Override
-    public UserResponseBody getUserByIdOrThrow(String userId){
+    public UserResponseBody getUserByIdOrThrow(String userId) {
         UserProfile userProfile = userRepository.findByUserId(userId);
-        if(userProfile == null){
-            logger.warn("User with userId={} not found",userId);
-            throw new UserNotFoundException( "User with id " + userId + " not found");
+        if (userProfile == null) {
+            logger.warn("User with userId={} not found", userId);
+            throw new UserNotFoundException("User with id " + userId + " not found");
         }
         return new UserResponseBody(userProfile);
     }
+
     @Override
-    public UserUpdatedResponseBody updateUserDetailsById(String userId, UserUpdatedRequestBody userUpdatedRequestBody){
+    public UserUpdatedResponseBody updateUserDetailsById(String userId, UserUpdatedRequestBody userUpdatedRequestBody) {
         UserProfile currentUserProfile = userRepository.findByUserId(userId);
-        if(currentUserProfile == null){
-            logger.warn("User with userId={} not found",userId);
-            throw new UserNotFoundException( "User with id " + userId + " not found");
+        if (currentUserProfile == null) {
+            logger.warn("User with userId={} not found", userId);
+            throw new UserNotFoundException("User with id " + userId + " not found");
         }
         currentUserProfile.setName(userUpdatedRequestBody.getName());
         currentUserProfile.setAge(userUpdatedRequestBody.getAge());
@@ -59,11 +67,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(currentUserProfile);
         return new UserUpdatedResponseBody(currentUserProfile);
     }
-    @Override
-    public String deleteUserById(String userId){
-         userRepository.deleteById(userId);
-        return "User with Id "+ userId + " is deleted";
-        //logger.info("User with Id={}",userId);
 
+    @Override
+    public String deleteUserById(String userId) {
+        userRepository.deleteById(userId);
+        return "User with Id " + userId + " is deleted";
     }
 }
