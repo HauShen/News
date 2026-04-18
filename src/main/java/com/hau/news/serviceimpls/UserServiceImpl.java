@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     private static final Logger logger =
             LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     @Override
     public UserResponseBody createUser(UserRequestBody userRequestBody) {
@@ -34,7 +36,9 @@ public class UserServiceImpl implements UserService {
         newUserProfile.setAge(userRequestBody.getAge());
         newUserProfile.setRole(userRequestBody.getRole());
         newUserProfile.setEmail(id + "@news-app.local");
-        newUserProfile.setPassword(passwordEncoder.encode("changeme"));
+        // Admin-created users get a random password; they should use the signup flow to set credentials
+        String randomPassword = UUID.randomUUID().toString() + SECURE_RANDOM.nextLong();
+        newUserProfile.setPassword(passwordEncoder.encode(randomPassword));
         logger.info("User created with id={}", newUserProfile.getUserId());
         logger.debug("User details: name={}, age={}, role={}",
                 newUserProfile.getName(),
