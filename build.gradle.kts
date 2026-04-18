@@ -55,9 +55,12 @@ tasks.withType<Test> {
 // ---- Frontend build integration ----
 val frontendDir = file("frontend")
 
+val isWindows = System.getProperty("os.name").lowercase().contains("win")
+val npm = if (isWindows) listOf("cmd", "/c", "npm") else listOf("npm")
+
 val installFrontend = tasks.register<Exec>("installFrontend") {
 	workingDir = frontendDir
-	commandLine("npm", "install")
+	commandLine(npm + "install")
 	inputs.file(frontendDir.resolve("package.json"))
 	inputs.file(frontendDir.resolve("package-lock.json"))
 	outputs.dir(frontendDir.resolve("node_modules"))
@@ -66,7 +69,7 @@ val installFrontend = tasks.register<Exec>("installFrontend") {
 val buildFrontend = tasks.register<Exec>("buildFrontend") {
 	dependsOn(installFrontend)
 	workingDir = frontendDir
-	commandLine("npm", "run", "build")
+	commandLine(npm + listOf("run", "build"))
 	inputs.dir(frontendDir.resolve("src"))
 	inputs.file(frontendDir.resolve("index.html"))
 	inputs.file(frontendDir.resolve("vite.config.js"))
