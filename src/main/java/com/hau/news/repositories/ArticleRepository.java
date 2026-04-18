@@ -16,4 +16,6 @@ SELECT article FROM Article article WHERE article.createdAt >= :startOfDay AND a
  """ )
 
      List<Article> findTodayUnsentArticles(@Param("startOfDay") Instant startOfDay,@Param("endOfDay") Instant endOfDay);
+
+     List<Article> findAllByOrderByLikeCountDesc();
 }

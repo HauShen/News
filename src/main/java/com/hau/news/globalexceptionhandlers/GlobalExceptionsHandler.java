@@ -1,6 +1,7 @@
 package com.hau.news.globalexceptionhandlers;
 
 import com.hau.news.models.exceptions.ArticleNotFoundException;
+import com.hau.news.models.exceptions.DuplicateLikeException;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
 import com.hau.news.models.exceptions.TodayArticleNoFoundException;
@@ -51,5 +52,11 @@ public class GlobalExceptionsHandler {
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("error", "Access denied. You don't have permission to perform this action."));
+    }
+
+    @ExceptionHandler(DuplicateLikeException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateLike(DuplicateLikeException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", ex.getMessage()));
     }
 }

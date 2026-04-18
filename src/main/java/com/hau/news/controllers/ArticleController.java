@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/article")
 public class ArticleController {
@@ -53,6 +55,12 @@ public class ArticleController {
     public String deleteArticleByOid(@PathVariable Long oid){
         return articleService.deleteArticleByOid(oid);
 
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'NEWS_POSTER', 'READER')")
+    @GetMapping("/all")
+    public ResponseEntity<List<ArticleResponseBody>> getAllArticlesSortedByLikeCount(){
+        return ResponseEntity.ok(articleService.getAllArticlesSortedByLikeCount());
     }
 
 }

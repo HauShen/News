@@ -15,7 +15,5 @@ public interface ArticleService {
     ArticleUpdatedResponseBody editArticleByOid(Long oid, ArticleUpdatedRequestBody articleUpdatedRequestBody);
     String deleteArticleByOid(Long oid);
     Article turnsAndSavesNYTimesNewsToArticle(String userId);
-
-
-
+    List<ArticleResponseBody> getAllArticlesSortedByLikeCount();
 }

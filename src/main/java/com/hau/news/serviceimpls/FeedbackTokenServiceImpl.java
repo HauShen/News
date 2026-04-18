@@ -3,6 +3,7 @@ package com.hau.news.serviceimpls;
 import com.hau.news.models.Article;
 import com.hau.news.models.Feedback;
 import com.hau.news.models.UserProfile;
+import com.hau.news.models.exceptions.DuplicateLikeException;
 import com.hau.news.models.exceptions.ExpiredTokenException;
 import com.hau.news.models.exceptions.InvalidTokenException;
 import com.hau.news.repositories.ArticleRepository;
@@ -129,8 +130,8 @@ public class FeedbackTokenServiceImpl {
 
             // Check if already liked
             if (feedbackRepository.existsByUserAndArticle(user, article)) {
-                logger.info("Like already exists for userId: {}, articleOid: {}", userId, articleOid);
-                return;
+                logger.warn("User {} already liked article {}", userId, articleOid);
+                throw new DuplicateLikeException("You have already liked this article.");
             }
 
             // Save like with entity references
@@ -159,8 +160,8 @@ public class FeedbackTokenServiceImpl {
             }
 
             if (feedbackRepository.existsByUserAndArticle(user, article)) {
-                logger.info("Like already exists for userId: {}, articleOid: {}", userId, articleOid);
-                return;
+                logger.warn("User {} already liked article {}", userId, articleOid);
+                throw new DuplicateLikeException("You have already liked this article.");
             }
 
             Feedback feedback = new Feedback(user, article, true);

@@ -107,5 +107,13 @@ public class ArticleServiceImpl implements ArticleService {
         return article;
     }
 
+    @Override
+    public List<ArticleResponseBody> getAllArticlesSortedByLikeCount() {
+        List<Article> articles = articleRepository.findAllByOrderByLikeCountDesc();
+        return articles.stream()
+                .map(ArticleResponseBody::new)
+                .toList();
+    }
+
 
 }
