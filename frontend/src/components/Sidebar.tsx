@@ -11,6 +11,7 @@ const publicLinks = [
 
 const authenticatedLinks = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/articles", label: "Articles" },
 ];
 
 const adminLinks = [

@@ -136,6 +136,7 @@ export const articleApi = {
     apiRequest<string>(`/article/delete/${id}`, {
       method: "DELETE",
     }),
+  getAllSortedByLikes: () => apiRequest<ArticleResponse[]>("/article/all"),
 };
 
 export const newsApi = {
