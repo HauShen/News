@@ -40,7 +40,7 @@ _______
 Admin dsashBoard:
 <img width="1920" height="922" alt="AdminDaashBoard" src="https://github.com/user-attachments/assets/3cd91151-f99f-4aba-8eca-2803821e79ba" />
 _______
-Show articles: (Article sort by like count from high to low)
+Show articles: (Articles sort by like count from high to low)
 <img width="1920" height="964" alt="ShowAllArticles" src="https://github.com/user-attachments/assets/d16ed5b5-5b80-4be8-98a2-078f8d680989" />
 _______
 Feedback page:
