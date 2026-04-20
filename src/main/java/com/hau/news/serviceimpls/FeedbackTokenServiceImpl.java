@@ -20,6 +20,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -113,6 +114,7 @@ public class FeedbackTokenServiceImpl {
     /**
      * Saves a like for user and article
      */
+    @Transactional
     public void saveLike(String userId, Long articleOid) {
         try {
             // ✅ Fetch entities from repositories
@@ -137,6 +139,11 @@ public class FeedbackTokenServiceImpl {
             // Save like with entity references
             Feedback feedback = new Feedback(user, article, true);
             feedbackRepository.save(feedback);
+
+            // Increment the article's like count
+            article.setLikeCount(article.getLikeCount() + 1);
+            articleRepository.save(article);
+
             logger.info("Like saved for userId: {}, articleOid: {}", userId, articleOid);
         } catch (Exception e) {
             logger.error("Error saving like", e);
@@ -147,6 +154,7 @@ public class FeedbackTokenServiceImpl {
     /**
      * Save like with token
      */
+    @Transactional
     public void saveLikeWithToken(String userId, Long articleOid, String token) {
         try {
             UserProfile user = userRepository.findByUserId(userId);
@@ -167,6 +175,11 @@ public class FeedbackTokenServiceImpl {
             Feedback feedback = new Feedback(user, article, true);
             feedback.setUserToken(token);
             feedbackRepository.save(feedback);
+
+            // Increment the article's like count
+            article.setLikeCount(article.getLikeCount() + 1);
+            articleRepository.save(article);
+
             logger.info("Like saved with token for userId: {}, articleOid: {}", userId, articleOid);
         } catch (Exception e) {
             logger.error("Error saving like with token", e);
